@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <title>Slider Demo</title>
+  <style>
+    body {
+      margin: 1rem;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    }
+    .carousel {
+      position: relative;
+      text-align: center;
+    }
+
+    .item + .item {
+      margin-left: 1rem;
+    }
+
+    .item h1 {
+      margin: 0;
+      padding: 4vh 0;
+      text-align: center;
+      background-color: #e6e6e6;
+      font-size: 8vw;
+    }
+
+    .item:nth-child(even) h1 {
+      background-color: #f6f6f6;
+    }
+
+    .times {
+      font-family: 'Times New Roman', serif;
+    }
+    .times .item {
+      min-width: 40%;
+    }
+    #previous,
+    #next {
+      margin-top: calc(var(--scrollbar-height) / -2);
+      padding: 0;
+      width: 3rem;
+      height: 3rem;
+      appearance: none;
+      -webkit-appearance: none;
+      border: none;
+      background-color: rgba(0,0,0,.8);
+      border-radius: 9999px;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      position: absolute;
+      left: -.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    #previous svg,
+    #next svg {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+    #previous[disabled],
+    #next[disabled] {
+      opacity: 0.3;
+    }
+    #next {
+      left: auto;
+      right: -.75rem;
+    }
+
+    .helvetica {
+      font-family: 'Helvetica Neue', sans-serif;
+    }
+    .helvetica .item {
+      min-width: 100%;
+    }
+
+    nav {
+      display: flex;
+      margin-bottom: .25rem;
+    }
+    nav * {
+      flex: 1;
+    }
+    a {
+      padding: .5rem;
+      font-family: 'Helvetica Neue', sans-serif;
+      font-weight: 700;
+      text-decoration: none;
+      color: blue;
+      transition: all .5s;
+      border-bottom: .25rem solid #e6e6e6;
+    }
+    a[aria-current="true"] {
+      border-color: black;
+      color: black;
+    }
+  </style>
+  <script src="./slide-r.js"></script>
+</head>
+<body>
+  <h2>Next / previous navigation</h2>
+  <div class="carousel">
+    <slide-r class="times" id="times">
+      <article class="item"><h1>Times</h1></article>
+      <article class="item"><h1>New</h1></article>
+      <article class="item"><h1>Roman</h1></article>
+      <article class="item"><h1>Bold</h1></article>
+    </slide-r>
+
+    <button id="previous" aria-label="Previous"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg></button>
+    <button id="next" aria-label="Next"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></button>
+  </div>
+
+  <h2>Full-width tabbed navigation</h2>
+  <div class="carousel">
+    <nav>
+      <a href="#helvetica_1">Helvetica</a>
+      <a href="#helvetica_2">Neue</a>
+      <a href="#helvetica_3">Bold</a>
+    </nav>
+    <slide-r class="helvetica" id="helvetica">
+      <article class="item" id="helvetica_1"><h1>Helvetica</h1></article>
+      <article class="item" id="helvetica_2"><h1>Neue</h1></article>
+      <article class="item" id="helvetica_3"><h1>Bold</h1></article>
+    </slide-r>
+  </div>
+
+  <script>
+    ;(function () {
+      // Determine scrollbar height for precise next/prev button positioning
+      Array.from(document.querySelectorAll('slide-r')).forEach(element => {
+        const diff = element.offsetHeight - element.clientHeight
+        if (diff !== 0) {
+          element.parentNode.style.setProperty('--scrollbar-height', `${diff}px`)
+        }
+      })
+
+      // Times
+      const times = document.getElementById('times')
+      const previous = document.getElementById('previous')
+      const next = document.getElementById('next')
+
+      let timesIndex = 0
+      times.addEventListener('change', ({ detail }) => {
+        timesIndex = detail.activeItem.index
+        previous.disabled = detail.isStart
+        next.disabled = detail.isEnd
+      })
+
+      previous.onclick = () => times.goTo(timesIndex - 1)
+      next.onclick = () => times.goTo(timesIndex + 1)
+
+      // Helvetica
+      const helvetica = document.getElementById('helvetica')
+
+      helvetica.addEventListener('change', ({ detail: { activeItem } }) => {
+        if (activeItem) {
+          Array.from(document.querySelectorAll('nav a')).forEach(element => {
+            element.setAttribute(
+              'aria-current',
+              element.hash.substr(1) === activeItem.element.id
+            )
+          })
+        }
+      })
+
+      document.addEventListener('click', (event) => {
+        if (event.target.matches('a')) {
+          event.preventDefault()
+          helvetica.goTo(document.querySelector(event.target.hash))
+        }
+      })
+    })()
+  </script>
+</body>
+</html>
