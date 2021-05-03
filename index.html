@@ -87,7 +87,7 @@
     nav * {
       flex: 1;
     }
-    a {
+    nav a {
       padding: .5rem;
       font-family: 'Helvetica Neue', sans-serif;
       font-weight: 700;
@@ -96,7 +96,7 @@
       transition: all .5s;
       border-bottom: .25rem solid #e6e6e6;
     }
-    a[aria-current="true"] {
+    nav a[aria-current="true"] {
       border-color: black;
       color: black;
     }
@@ -130,6 +130,8 @@
       <article class="item" id="helvetica_3"><h1>Bold</h1></article>
     </slide-r>
   </div>
+
+  <p><a href="https://github.com/domchristie/slide-r">Source on GitHub</a></p>
 
   <script>
     ;(function () {
@@ -171,7 +173,7 @@
       })
 
       document.addEventListener('click', (event) => {
-        if (event.target.matches('a')) {
+        if (event.target.matches('nav a')) {
           event.preventDefault()
           helvetica.goTo(document.querySelector(event.target.hash))
         }
